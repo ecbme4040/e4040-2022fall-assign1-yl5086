@@ -3,6 +3,9 @@ The assignment is distributed as several jupyter notebooks and a number of direc
 
 # Students need to follow the instructions below, and they also need to edit the README.md such that key information is shown in it - right after this line
 TODO students to add text summarizing the key (high level) modifications that they did to solve the assignment
+For Task1
+Also, some Task1 defined functionsare used 
+For Task2 the most challenging part is the class twolayernet. It is not only a integration of a lot of functions, but implements the core scheme of a nerual network.
 
 # Detailed instructions how to submit this assignment/homework:
 1. The assignment will be distributed as a github classroom assignment - as a special repository accessed through a link
