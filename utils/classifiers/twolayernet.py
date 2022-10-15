@@ -5,7 +5,6 @@ Implementation of a two-layer network.
 import numpy as np
 from utils.layer_utils import AffineLayer, DenseLayer
 
-
 class TwoLayerNet(object):
     """
     A two-layer fully-connected neural network. The net has an input dimension of
@@ -15,7 +14,7 @@ class TwoLayerNet(object):
     connected layer.
 
     In other words, the network has the following architecture:
-    input -> DenseLayer -> AffineLayer -> softmax loss -> output
+    input -> DenseLayer -> AffineLayer -> softmax -> output
     Or more detailed,
     input -> affine transform -> Leaky_ReLU -> affine transform -> softmax -> output
 
@@ -29,7 +28,9 @@ class TwoLayerNet(object):
         - weight_scale: (float) for layer weight initialization
         """
 
+        # instantiate a DenseLayer (layer1) object as input layer
         self.layer1 = DenseLayer(input_dim, hidden_dim, weight_scale=weight_scale)
+        # instantiate a AffineLayer (layer2) object as input layer
         self.layer2 = AffineLayer(hidden_dim, num_classes, weight_scale=weight_scale)
         self.reg = reg
         self.velocities = None
@@ -41,23 +42,27 @@ class TwoLayerNet(object):
         Inputs:
         - X: a numpy array of (N, D) containing input data
 
-        Returns a numpy array of (N, K) containing prediction scores
+        Returns:
+        - layer2_out: a numpy array of (N, num_classes(a.k.a. K)) containing prediction scores
+         NOTE: the scores should not be softmaxed.
         """
+        ############################################################################
+        # TODO: Feedforward
+        # NOTE: Use the methods defined for the layers in layer_utils.py
+        ############################################################################
+        # START OF Yufan's CODE
+        
+        ## Step1: input -> layer1 -> layer1_out
+        layer1_out = self.layer1.feedforward(X) # given input, get layer1 output
+        
+        ## Step2: layer1_out -> layer2 ->layer2_out
+        layer2_out = self.layer2.feedforward(layer1_out) # get layer2 output
+        
+        # raise NotImplementedError
+        # END OF Yufan's CODE
+        ############################################################################
 
-        ############################################################################
-        #                        START OF YOUR CODE                                #
-        ############################################################################
-        ############################################################################
-        # TODO: Feedforward                                                        #
-        # NOTE: Use the methods defined for the layers in layer_utils.py           #
-        ############################################################################
-
-        #raise NotImplementedError
-        ############################################################################
-        #                          END OF YOUR CODE                                #
-        ############################################################################
-
-        return X
+        return layer2_out
 
     def loss(self, scores, labels):
         """
@@ -66,8 +71,8 @@ class TwoLayerNet(object):
         Do regularization for better model generalization.
 
         Inputs:
-        - scores: a numpy array of (N, K) containing prediction scores 
-        - labels: a numpy array of (N,) containing ground truth
+        - scores: a numpy array of (N, num_classes(a.k.a. K)) containing prediction scores 
+        - labels (int): a numpy array of (N,) containing ground truth
 
         Return loss value (float)
         """
@@ -77,24 +82,33 @@ class TwoLayerNet(object):
         from ..layer_funcs import softmax_loss
 
         ############################################################################
-        #                        START OF YOUR CODE                                #
+        # TODO:
+        # Backpropogation, here is just one dense layer, it should be pretty easy
+        # NOTE: Use the methods defined for each layer, and you no longer need to
+        # mannually cache the parameters because it would be taken care of by the
+        # functions in layer_utils.py
         ############################################################################
-        ############################################################################
-        # TODO:                                                                    #
-        # Backpropogation, here is just one dense layer, it should be pretty easy  #
-        # NOTE: Use the methods defined for each layer, and you no longer need to  #
-        # mannually cache the parameters because it would be taken care of by the  #
-        # functions in layer_utils.py                                              #
-        ############################################################################
-
-        #raise NotImplementedError
-        ############################################################################
-        #                          END OF YOUR CODE                                #
+        # START OF Yufan's CODE
+        
+        # Calculate the cross-entropy loss and gradient at layer2 output
+        loss, dout = softmax_loss(scores, labels) # scores is (N, K). labels is (N, )
+        
+        # back propagation at layer2
+        dx_2 = self.layer2.backward(dout)
+        # dW_2, db_2 = self.layer2.gradients['W'], self.layer2.gradients['b']
+        # ↑ no need to get gradients here
+        
+        # back propagation at layer1
+        dx_1 = self.layer1.backward(dx_2)
+        # dW_1, db_1 = self.layer1.gradients['W'], self.layer1.gradients['b']
+        # ↑ no need to get gradients here
+        
+        # END OF Yufan's CODE
+        # raise NotImplementedError
         ############################################################################
 
         # Add L2 regularization
-        squared_weights = np.sum(self.layer1.params['W']**2) \
-            + np.sum(self.layer2.params['W']**2) # equivalant to a squared Frobenius norm
+        squared_weights = np.power(self.layer1.params['W'],2).sum() + np.power(self.layer2.params['W'],2).sum()
         loss += 0.5 * self.reg * squared_weights
 
         return loss
@@ -102,10 +116,10 @@ class TwoLayerNet(object):
     def step(self, learning_rate=1e-5, optim='SGD', momentum=0.5):
         """
         Use SGD to implement a single-step update to each weight and bias.
-        Set learning rate to 0.00001, momentum to 0.5.
+        Default learning rate = 0.00001, use SGD with momentum, momentum = 0.5.
         """
 
-        # fetch the parameters from layer cache
+        # fetch the parameters from layer cache and form a dictionary
         params = {
             'l1_W': self.layer1.params['W'], 
             'l1_b': self.layer1.params['b'], 
@@ -119,27 +133,32 @@ class TwoLayerNet(object):
             'l2_b': self.layer2.gradients['b']
         }
 
-        # fetch the velocities stored from previous iteration
+        # fetch the velocities stored from previous iteration and form a dictionary
         # if None (i.e. this is the first iteration), build velocities from scratch
-        velocities = self.velocities or \
-            {name: np.zeros_like(param) for name, param in params.items()}
+        velocities = self.velocities or {name: np.zeros_like(param) for name, param in params.items()}
 
         # Add L2 regularization:
         reg = self.reg
         grads = {name: grad+ reg * params[name] for name, grad in grads.items()}
 
         ############################################################################
-        # TODO:                                                                    #
-        # Use SGD or SGD with momentum to update variables in layer1 and layer2    #
-        # NOTE: iterate through all the parameters and do the update one by one    #
+        # TODO:
+        # Use SGD or SGD with momentum to update variables in layer1 and layer2
+        # NOTE: iterate through all the parameters and do the update one by one
         ############################################################################
-        ############################################################################
-        #                         START OF YOUR CODE                               #
-        ############################################################################
+        # START OF Yufan's CODE
 
-        #raise NotImplementedError
-        ############################################################################
-        #                          END OF YOUR CODE                                #
+        for i in range(2):
+            # l{i+1}_W
+            key_W = "l" + str(i+1) + "_W" # apply this key to the following dictionaries for calculation
+            params[key_W] = params[key_W] - (learning_rate * grads[key_W])
+            
+            # l{i+1}_b
+            key_b = "l" + str(i+1) + "_b" # apply this key to the following dictionaries for calculation
+            params[key_b] = params[key_b] - (learning_rate * grads[key_b])
+        
+        # raise NotImplementedError
+        # END OF Yufan's CODE
         ############################################################################
 
         # update parameters in layers (2 parameters W & b in each layer)
@@ -158,21 +177,28 @@ class TwoLayerNet(object):
         - X: (float) a tensor of shape (N, D)
 
         Returns: 
-        - preds: (int) an array of length N
+        - preds: (int) an array of labels, shape (N, 1)
         """
 
         preds = np.zeros(X.shape[0])
 
         ############################################################################
-        # TODO: generate predictions                                               #
+        # TODO: generate predictions
         ############################################################################
-        ############################################################################
-        #                         START OF YOUR CODE                               #
-        ############################################################################
+        # START OF Yufan's CODE
 
-        #raise NotImplementedError
-        ############################################################################
-        #                          END OF YOUR CODE                                #
+        # Call out forward and softmax for softmaxed out
+        from utils.classifiers.softmax import softmax
+        temp = softmax(self.forward(X))
+        
+        # reverse onehot encoding (scores -> labels)
+        for i in range(temp.shape[0]):
+            for j in range(temp.shape[1]):
+                if(np.around(temp[i][j]) == 1):
+                    preds[i] = j # record non-zero index as label
+        
+        # raise NotImplementedError
+        # END OF Yufan's CODE
         ############################################################################
 
         return preds

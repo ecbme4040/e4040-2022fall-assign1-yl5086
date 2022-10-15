@@ -4,12 +4,11 @@ Implementation of basic classifiers.
 
 import numpy as np
 
-
 class BasicClassifier:
     """ A basic classfier """
 
     def __init__(self):
-        self.W = None
+        self.W = None # weight
         self.velocity = None
 
     def w_init(self, dim, num_classes):
@@ -73,40 +72,42 @@ class BasicClassifier:
         # Run stochastic gradient descent to optimize W
         loss_history = []
         for it in range(num_iters):
+            ########################################################################
+            # TODO:                                           
+            # Sample batch_size elements from the training data and their       
+            # corresponding labels to use in this round of gradient descent.     
+            # Store the data in X_batch and their corresponding labels in       
+            # y_batch; after sampling X_batch should have shape (batch_size, dim)  
+            # and y_batch should have shape (batch_size,)                  
+            # Hint: Use np.random.choice to generate indices. Sometimes, random   
+            # choice will be better than training in order.                 
+            ########################################################################
+            # START OF Yufan's CODE                                 
 
-            ########################################################################
-            # TODO:                                                                #
-            # Sample batch_size elements from the training data and their          #
-            # corresponding labels to use in this round of gradient descent.       #
-            # Store the data in X_batch and their corresponding labels in          #
-            # y_batch; after sampling X_batch should have shape (batch_size, dim)  #
-            # and y_batch should have shape (batch_size,)                          #
-            #                                                                      #
-            # Hint: Use np.random.choice to generate indices. Sometimes, random    #
-            # choice will be better than training in order.                        #
-            ########################################################################
-            ########################################################################
-            #                     START OF YOUR CODE                               #
-            ########################################################################
-
+            X_batch = np.zeros((batch_size, dim))
+            y_batch = np.zeros(batch_size)
+            index = np.random.choice(num_train, batch_size) # randomly choose (batch_size, 1) as index
+            for i in range(batch_size):
+                X_batch[i] = X[index[i]] # apply random index to X and y
+                y_batch[i] = y[index[i]]
+            
             # raise NotImplementedError
-            ########################################################################
-            #                       END OF YOUR CODE                               #
-            ########################################################################
-
-            ########################################################################
-            # TODO:                                                                #
-            # Update the weights using the gradient and the learning rate.         #
-            #                                                                      #
-            # Hint: use self.loss() to compute the loss and gradient               #
-            ########################################################################
-            ########################################################################
-            #                     START OF YOUR CODE                               #
+            # END OF Yufan's CODE
             ########################################################################
 
+            ########################################################################
+            # TODO:                                                                
+            # Update the weights using the gradient and the learning rate.
+            # Hint: use self.loss() to compute the loss and gradient
+            ########################################################################
+            # START OF Yufan's CODE                                 
+
+            loss, dW = self.loss(X_batch, y_batch, reg) # get loss and gradient
+            loss_history.append(loss) # stroage loss
+            self.W -= learning_rate * dW # update weight by gradient
+            
             # raise NotImplementedError
-            ########################################################################
-            #                    END OF YOUR CODE                                  #
+            # END OF Yufan's CODE
             ########################################################################
 
             if verbose and it % 100 == 0:
@@ -161,21 +162,20 @@ class LogisticRegression(BasicClassifier):
 
     def predict(self, X):
 
-        y_pred = np.zeros(X.shape[0])
+        y_pred = np.zeros(X.shape[0]) # X is (N, D+1) matrix
+
+        ########################################################################
+        # TODO:
+        # Implement this method. Store the predicted labels in y_pred.
+        ########################################################################
+        # START OF Yufan's CODE                                 
 
         from .logistic_regression import sigmoid
-
-        ########################################################################
-        # TODO:                                                                #
-        # Implement this method. Store the predicted labels in y_pred.         #
-        ########################################################################
-        ########################################################################
-        #                     START OF YOUR CODE                               #
-        ########################################################################
-
+        temp = sigmoid(np.matmul(X, self.W)) 
+        y_pred = np.around(temp) # y_pred is (N, 1) matrix
+        
         # raise NotImplementedError
-        ########################################################################
-        #                    END OF YOUR CODE                                  #
+        # END OF Yufan's CODE
         ########################################################################
 
         return y_pred
@@ -193,19 +193,24 @@ class Softmax(BasicClassifier):
 
     def predict(self, X):
 
-        y_pred = np.zeros(X.shape[0])
+        y_pred = np.zeros(X.shape[0]) # X is (N, D+1) matrix
 
         ########################################################################
-        # TODO:                                                                #
-        # Implement this method. Store the predicted labels in y_pred.         #
+        # TODO:
+        # Implement this method. Store the predicted labels in y_pred.
         ########################################################################
-        ########################################################################
-        #                     START OF YOUR CODE                               #
-        ########################################################################
+        # START OF Yufan's CODE
+        
+        from .softmax import softmax
+        temp = softmax(np.matmul(X, self.W)) # temp is (N, K) matrix because of onehot encoding
+        # reverse onehot encoding
+        for i in range(temp.shape[0]):
+            for j in range(temp.shape[1]):
+                if(np.around(temp[i][j]) == 1):
+                    y_pred[i] = j # record non-zero index as label
 
         # raise NotImplementedError
-        ########################################################################
-        #                    END OF YOUR CODE                                  #
+        # END OF Yufan's CODE
         ########################################################################
 
         return y_pred
