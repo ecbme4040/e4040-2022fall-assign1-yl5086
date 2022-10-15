@@ -3,8 +3,11 @@ The assignment is distributed as several jupyter notebooks and a number of direc
 
 # Students need to follow the instructions below, and they also need to edit the README.md such that key information is shown in it - right after this line
 For Task1, the most important modification is the implementation of softmax from scratch. Also, some functions defined in Task1 are useful in later tasks, like "onehot" and "softmax".
+
 For Task2, the most challenging part is the class twolayernet. It is not only an integration of Task2 and Task1 but also paves the way for the class. The "step" function took me a lot of time to understand, especially how python dictionaries work.
+
 For Task3, I created the 4-layer network based on the demo network, as well as using loops instead of simply copying the code. The tSNE part needs some iterations to better understand the meaning of important parameter "perplexity".
+
 Task4 is answering questions and concluding the homework. The simple modification I made is to add a sell for tree printing.
 
 # Detailed instructions how to submit this assignment/homework:
