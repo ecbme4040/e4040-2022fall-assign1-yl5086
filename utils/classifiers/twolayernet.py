@@ -116,7 +116,7 @@ class TwoLayerNet(object):
     def step(self, learning_rate=1e-5, optim='SGD', momentum=0.5):
         """
         Use SGD to implement a single-step update to each weight and bias.
-        Default learning rate = 0.00001, use SGD with momentum, momentum = 0.5.
+        Default learning rate = 0.00001, use SGD without momentum, momentum = 0.5.
         """
 
         # fetch the parameters from layer cache and form a dictionary
