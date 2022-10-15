@@ -2,10 +2,10 @@
 The assignment is distributed as several jupyter notebooks and a number of directories and subdirectories in utils.
 
 # Students need to follow the instructions below, and they also need to edit the README.md such that key information is shown in it - right after this line
-TODO students to add text summarizing the key (high level) modifications that they did to solve the assignment
-For Task1
-Also, some Task1 defined functionsare used 
-For Task2 the most challenging part is the class twolayernet. It is not only a integration of a lot of functions, but implements the core scheme of a nerual network.
+For Task1, the most important modification is the implementation of softmax from scratch. Also, some functions defined in Task1 are useful in later tasks, like "onehot" and "softmax".
+For Task2, the most challenging part is the class twolayernet. It is not only an integration of Task2 and Task1 but also paves the way for the class. The "step" function took me a lot of time to understand, especially how python dictionaries work.
+For Task3, I created the 4-layer network based on the demo network, as well as using loops instead of simply copying the code. The tSNE part needs some iterations to better understand the meaning of important parameter "perplexity".
+Task4 is answering questions and concluding the homework. The simple modification I made is to add a sell for tree printing.
 
 # Detailed instructions how to submit this assignment/homework:
 1. The assignment will be distributed as a github classroom assignment - as a special repository accessed through a link
@@ -29,17 +29,33 @@ INSTRUCTIONS for naming the students' solution repository for assignments with m
 # Organization of this directory
 
 ```
-.
+./
 ├── Assignment1_intro.ipynb
 ├── README.md
+├── figures
+│   ├── yl5086_gcp_work_example_screenshot_1.png
+│   ├── yl5086_gcp_work_example_screenshot_2.png
+│   └── yl5086_gcp_work_example_screenshot_3.png
 ├── requirements.txt
+├── save_models
+│   └── best_model.pkl
 ├── task1-basic_classifiers.ipynb
 ├── task2-mlp_numpy.ipynb
 ├── task3-mlp_tensorflow.ipynb
 ├── task4-questions.ipynb
 └── utils
-    ├── cifar_utils.py
+    ├── __pycache__
+    │   ├── display_funcs.cpython-36.pyc
+    │   ├── layer_funcs.cpython-36.pyc
+    │   ├── layer_utils.cpython-36.pyc
+    │   └── train_funcs.cpython-36.pyc
     ├── classifiers
+    │   ├── __pycache__
+    │   │   ├── basic_classifiers.cpython-36.pyc
+    │   │   ├── logistic_regression.cpython-36.pyc
+    │   │   ├── mlp.cpython-36.pyc
+    │   │   ├── softmax.cpython-36.pyc
+    │   │   └── twolayernet.cpython-36.pyc
     │   ├── basic_classifiers.py
     │   ├── logistic_regression.py
     │   ├── mlp.py
@@ -47,11 +63,14 @@ INSTRUCTIONS for naming the students' solution repository for assignments with m
     │   └── twolayernet.py
     ├── display_funcs.py
     ├── features
+    │   ├── __pycache__
+    │   │   ├── pca.cpython-36.pyc
+    │   │   └── tsne.cpython-36.pyc
     │   ├── pca.py
     │   └── tsne.py
     ├── layer_funcs.py
     ├── layer_utils.py
     └── train_funcs.py
 
-5 directories, 22 files
+8 directories, 33 files
 ```
